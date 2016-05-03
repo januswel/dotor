@@ -104,15 +104,16 @@ func createSymbolicLinks(rules map[string]string, sourceDirectoryPath string) er
 		sourceAbsolutePath := gofp.Join(sourceDirectoryAbsolutePath, source)
 		targetAbsolutePath := gofp.Join(targetDirectoryAbsolutePath, target)
 		if !jwfp.ExistsPath(sourceAbsolutePath) {
-			fmt.Printf("source file \"%s\" is not exists. skipping.\n", sourceAbsolutePath)
+			fmt.Printf("[skipped] \"%s\" source file is not exists.\n", sourceAbsolutePath)
 			continue
 		}
 		if jwfp.ExistsPath(targetAbsolutePath) {
-			fmt.Printf("target file \"%s\" is already exists. skipping.\n", targetAbsolutePath)
+			fmt.Printf("[skipped] \"%s\" target file is already exists.\n", targetAbsolutePath)
 			continue
 		}
-		fmt.Printf("creating symbolic link: %s => %s\n", sourceAbsolutePath, targetAbsolutePath)
+
 		// TODO: use os.Symlink()
+		fmt.Printf("[success] \"%s\" => \"%s\"\n", sourceAbsolutePath, targetAbsolutePath)
 	}
 
 	return nil
