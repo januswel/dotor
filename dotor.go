@@ -11,7 +11,7 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-// yaml special keys
+// special keys in settings
 const (
 	DEFAULT_KEY = "default"
 	SOURCE_KEY  = "source"
