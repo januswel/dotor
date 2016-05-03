@@ -15,8 +15,10 @@ cd /path/to/your/dotfiles
 git clone git@github.com:youraccount/dotfiles.git .
 
 # creates symlinks in keeping with a setting file
-dotor dotorrc.yml /path/to/your/dotfiles
+dotor dotor.yml /path/to/your/dotfiles
 ```
+
+See [dotor.yml.sample](./blob/master/dotor.yml.sample) to add target files.
 
 ## future works
 
