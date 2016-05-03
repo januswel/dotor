@@ -18,7 +18,7 @@ git clone git@github.com:youraccount/dotfiles.git .
 dotor dotor.yml /path/to/your/dotfiles
 ```
 
-See [dotor.yml.sample](./blob/master/dotor.yml.sample) to add target files.
+See [dotor.yml.sample](./dotor.yml.sample) to add target files.
 
 ## future works
 
