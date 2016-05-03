@@ -17,12 +17,6 @@ const (
 	TARGET_KEY  = "target"
 )
 
-// temporary definitions for dev
-const (
-	SETTINGS_FILE_NAME = "dotorrc.sample.yml"
-	SOURCE_PATH        = "/Users/janus/work/dev/github/dotfiles"
-)
-
 func main() {
 	defer func() {
 		if r := recover(); r != nil {
@@ -30,7 +24,13 @@ func main() {
 		}
 	}()
 
-	settings, err := yaml.ReadFromFile(SETTINGS_FILE_NAME)
+	if len(os.Args) != 3 {
+		panic(fmt.Errorf("Usage: %s <setting file name> <source path>", os.Args[0]))
+	}
+	settingsFileName := os.Args[1]
+	sourcePath := os.Args[2]
+
+	settings, err := yaml.ReadFromFile(settingsFileName)
 	if err != nil {
 		panic(err)
 	}
@@ -40,7 +40,7 @@ func main() {
 		panic(err)
 	}
 
-	err = createSymbolicLinks(rules, SOURCE_PATH)
+	err = createSymbolicLinks(rules, sourcePath)
 	if err != nil {
 		panic(err)
 	}
