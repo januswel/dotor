@@ -4,7 +4,9 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"path/filepath"
 	"runtime"
+	"strings"
 
 	"gopkg.in/yaml.v2"
 )
@@ -16,9 +18,15 @@ const (
 	TARGET_KEY  = "target"
 )
 
+// environment variable names
+const (
+	HOME_DIRECTORY = "HOME"
+)
+
 // temporary definitions for dev
 const (
 	SETTINGS_FILE_NAME = "dotorrc.sample.yml"
+	SOURCE_PATH        = "/Users/janus/work/dev/github/dotfiles"
 )
 
 func main() {
@@ -38,7 +46,10 @@ func main() {
 		panic(err)
 	}
 
-	fmt.Println(rules)
+	err = CreateSymbolicLinks(rules, SOURCE_PATH)
+	if err != nil {
+		panic(err)
+	}
 }
 
 func ReadSettings(filepath string) (map[interface{}]interface{}, error) {
@@ -106,4 +117,56 @@ func Extend(m1, m2 map[string]string) map[string]string {
 		result[k] = v
 	}
 	return (result)
+}
+
+func CreateSymbolicLinks(rules map[string]string, sourceDirectoryPath string) error {
+	targetDirectoryAbsolutePath, err := GetHomeDirectory()
+	if err != nil {
+		return err
+	}
+	sourceDirectoryAbsolutePath, err := filepath.Abs(sourceDirectoryPath)
+	if err != nil {
+		return err
+	}
+
+	fmt.Printf("%s => %s\n", sourceDirectoryAbsolutePath, targetDirectoryAbsolutePath)
+
+	for source, target := range rules {
+		sourceAbsolutePath := filepath.Join(sourceDirectoryAbsolutePath, source)
+		targetAbsolutePath := filepath.Join(targetDirectoryAbsolutePath, target)
+		if !ExistsPath(sourceAbsolutePath) {
+			fmt.Printf("source file \"%s\" is not exists. skipping.\n", targetAbsolutePath)
+			continue
+		}
+		if ExistsPath(targetAbsolutePath) {
+			fmt.Printf("target file \"%s\" is already exists. skipping.\n", targetAbsolutePath)
+			continue
+		}
+		fmt.Printf("creating symbolic link: %s => %s\n", sourceAbsolutePath, targetAbsolutePath)
+		// TODO: use os.Symlink()
+	}
+
+	return nil
+}
+
+func GetHomeDirectory() (dir string, err error) {
+	environmentVariables := GetEnvironmentVariables()
+	if _, ok := environmentVariables[HOME_DIRECTORY]; !ok {
+		return "", fmt.Errorf("Define the environment variable \"%s\"", HOME_DIRECTORY)
+	}
+	return environmentVariables[HOME_DIRECTORY], nil
+}
+
+func GetEnvironmentVariables() map[string]string {
+	environmentVariables := make(map[string]string)
+	for _, item := range os.Environ() {
+		splited := strings.Split(item, "=")
+		environmentVariables[splited[0]] = splited[1]
+	}
+	return environmentVariables
+}
+
+func ExistsPath(path string) bool {
+	_, err := os.Stat(path)
+	return !os.IsNotExist(err)
 }
