@@ -41,12 +41,12 @@ func main() {
 		panic(err)
 	}
 
-	rules, err := BuildRules(settings)
+	rules, err := buildRules(settings)
 	if err != nil {
 		panic(err)
 	}
 
-	err = CreateSymbolicLinks(rules, SOURCE_PATH)
+	err = createSymbolicLinks(rules, SOURCE_PATH)
 	if err != nil {
 		panic(err)
 	}
@@ -66,22 +66,22 @@ func ReadSettings(filepath string) (map[interface{}]interface{}, error) {
 	return settings, nil
 }
 
-func BuildRules(settings map[interface{}]interface{}) (map[string]string, error) {
-	defaultRules, err := BuildSpecificOsRules(DEFAULT_KEY, settings)
+func buildRules(settings map[interface{}]interface{}) (map[string]string, error) {
+	defaultRules, err := buildSpecificOsRules(DEFAULT_KEY, settings)
 	if err != nil {
 		return nil, err
 	}
 
-	osRules, err := BuildSpecificOsRules(runtime.GOOS, settings)
+	osRules, err := buildSpecificOsRules(runtime.GOOS, settings)
 	if err != nil {
 		return nil, err
 	}
 
-	rules := Extend(defaultRules, osRules)
+	rules := extend(defaultRules, osRules)
 	return rules, err
 }
 
-func BuildSpecificOsRules(os string, settings map[interface{}]interface{}) (map[string]string, error) {
+func buildSpecificOsRules(os string, settings map[interface{}]interface{}) (map[string]string, error) {
 	rules := make(map[string]string)
 	if _, hasKey := settings[os]; !hasKey {
 		return rules, nil
@@ -107,7 +107,7 @@ func BuildSpecificOsRules(os string, settings map[interface{}]interface{}) (map[
 	return rules, nil
 }
 
-func Extend(m1, m2 map[string]string) map[string]string {
+func extend(m1, m2 map[string]string) map[string]string {
 	result := map[string]string{}
 
 	for v, k := range m1 {
@@ -119,7 +119,7 @@ func Extend(m1, m2 map[string]string) map[string]string {
 	return (result)
 }
 
-func CreateSymbolicLinks(rules map[string]string, sourceDirectoryPath string) error {
+func createSymbolicLinks(rules map[string]string, sourceDirectoryPath string) error {
 	targetDirectoryAbsolutePath, err := GetHomeDirectory()
 	if err != nil {
 		return err
