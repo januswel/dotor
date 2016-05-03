@@ -1,0 +1,2 @@
+# dotor
+dotfile setuper
