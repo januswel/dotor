@@ -2,13 +2,12 @@ package main
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
-	"path/filepath"
+	gofp "path/filepath"
 	"runtime"
-	"strings"
 
-	"gopkg.in/yaml.v2"
+	jwfp "github.com/januswel/dotor/filepath"
+	"github.com/januswel/dotor/yaml"
 )
 
 // special keys in settings
@@ -16,11 +15,6 @@ const (
 	DEFAULT_KEY = "default"
 	SOURCE_KEY  = "source"
 	TARGET_KEY  = "target"
-)
-
-// environment variable names
-const (
-	HOME_DIRECTORY = "HOME"
 )
 
 // temporary definitions for dev
@@ -36,7 +30,7 @@ func main() {
 		}
 	}()
 
-	settings, err := ReadSettings(SETTINGS_FILE_NAME)
+	settings, err := yaml.ReadFromFile(SETTINGS_FILE_NAME)
 	if err != nil {
 		panic(err)
 	}
@@ -50,20 +44,6 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-}
-
-func ReadSettings(filepath string) (map[interface{}]interface{}, error) {
-	file, err := ioutil.ReadFile(filepath)
-	if err != nil {
-		return nil, err
-	}
-
-	settings := make(map[interface{}]interface{})
-	if err := yaml.Unmarshal(file, &settings); err != nil {
-		return nil, err
-	}
-
-	return settings, nil
 }
 
 func buildRules(settings map[interface{}]interface{}) (map[string]string, error) {
@@ -120,11 +100,11 @@ func extend(m1, m2 map[string]string) map[string]string {
 }
 
 func createSymbolicLinks(rules map[string]string, sourceDirectoryPath string) error {
-	targetDirectoryAbsolutePath, err := GetHomeDirectory()
+	targetDirectoryAbsolutePath, err := jwfp.GetHomeDirectory()
 	if err != nil {
 		return err
 	}
-	sourceDirectoryAbsolutePath, err := filepath.Abs(sourceDirectoryPath)
+	sourceDirectoryAbsolutePath, err := gofp.Abs(sourceDirectoryPath)
 	if err != nil {
 		return err
 	}
@@ -132,13 +112,13 @@ func createSymbolicLinks(rules map[string]string, sourceDirectoryPath string) er
 	fmt.Printf("%s => %s\n", sourceDirectoryAbsolutePath, targetDirectoryAbsolutePath)
 
 	for source, target := range rules {
-		sourceAbsolutePath := filepath.Join(sourceDirectoryAbsolutePath, source)
-		targetAbsolutePath := filepath.Join(targetDirectoryAbsolutePath, target)
-		if !ExistsPath(sourceAbsolutePath) {
+		sourceAbsolutePath := gofp.Join(sourceDirectoryAbsolutePath, source)
+		targetAbsolutePath := gofp.Join(targetDirectoryAbsolutePath, target)
+		if !jwfp.ExistsPath(sourceAbsolutePath) {
 			fmt.Printf("source file \"%s\" is not exists. skipping.\n", targetAbsolutePath)
 			continue
 		}
-		if ExistsPath(targetAbsolutePath) {
+		if jwfp.ExistsPath(targetAbsolutePath) {
 			fmt.Printf("target file \"%s\" is already exists. skipping.\n", targetAbsolutePath)
 			continue
 		}
@@ -147,26 +127,4 @@ func createSymbolicLinks(rules map[string]string, sourceDirectoryPath string) er
 	}
 
 	return nil
-}
-
-func GetHomeDirectory() (dir string, err error) {
-	environmentVariables := GetEnvironmentVariables()
-	if _, ok := environmentVariables[HOME_DIRECTORY]; !ok {
-		return "", fmt.Errorf("Define the environment variable \"%s\"", HOME_DIRECTORY)
-	}
-	return environmentVariables[HOME_DIRECTORY], nil
-}
-
-func GetEnvironmentVariables() map[string]string {
-	environmentVariables := make(map[string]string)
-	for _, item := range os.Environ() {
-		splited := strings.Split(item, "=")
-		environmentVariables[splited[0]] = splited[1]
-	}
-	return environmentVariables
-}
-
-func ExistsPath(path string) bool {
-	_, err := os.Stat(path)
-	return !os.IsNotExist(err)
 }
