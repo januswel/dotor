@@ -2,6 +2,7 @@ package core
 
 import (
 	"fmt"
+	"os"
 	gofp "path/filepath"
 	"runtime"
 	"sort"
@@ -142,7 +143,11 @@ func createSymbolicLinks(rules Rules, sourceDirectoryPath string) error {
 			continue
 		}
 
-		// TODO: use os.Symlink()
+		err := os.Symlink(sourceAbsolutePath, targetAbsolutePath)
+		if err != nil {
+			panic(err)
+		}
+
 		fmt.Printf("[success] \"%s\" => \"%s\"\n", sourceAbsolutePath, targetAbsolutePath)
 	}
 
