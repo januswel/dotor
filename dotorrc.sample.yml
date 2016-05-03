@@ -1,0 +1,38 @@
+default:
+    # bash
+    - .bash_aliases
+    - .bash_profile
+    - .bashrc
+
+    # zsh
+    - .zprofile
+    - .zshrc
+
+    # ls
+    - .dir_colors
+
+    # git
+    - .gitconfig
+    - .gitignore
+
+    # tmux
+    - .tmux.conf
+
+    # HTML Tidy
+    - .tidyrc
+
+    # vim
+    - .vim
+    - .vimrc
+    - .gvimrc
+
+    # Vimperator
+    - .vimperator
+    - .vimperatorrc
+
+# for windows settings
+windows:
+    - source: .vim
+      target: vimfiles
+    - source: .vimperator
+      target: vimperator
