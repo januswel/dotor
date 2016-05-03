@@ -4,6 +4,7 @@ import (
 	"fmt"
 	gofp "path/filepath"
 	"runtime"
+	"sort"
 
 	jwfp "github.com/januswel/dotor/filepath"
 	"github.com/januswel/dotor/yaml"
@@ -15,6 +16,26 @@ const (
 	SOURCE_KEY  = "source"
 	TARGET_KEY  = "target"
 )
+
+type Rule struct {
+	source string
+	target string
+}
+type Rules []Rule
+
+func (rules Rules) Len() int {
+	return len(rules)
+}
+func (rules Rules) Swap(i, j int) {
+	rules[i], rules[j] = rules[j], rules[i]
+}
+func (rules Rules) Less(i, j int) bool {
+	if rules[i].source == rules[j].source {
+		return (rules[i].target < rules[j].target)
+	} else {
+		return (rules[i].source < rules[j].source)
+	}
+}
 
 func Execute(settingsFileName, sourcePath string) error {
 	settings, err := yaml.ReadFromFile(settingsFileName)
@@ -35,7 +56,7 @@ func Execute(settingsFileName, sourcePath string) error {
 	return nil
 }
 
-func buildRules(settings map[interface{}]interface{}) (map[string]string, error) {
+func buildRules(settings map[interface{}]interface{}) (Rules, error) {
 	defaultRules, err := buildSpecificOsRules(DEFAULT_KEY, settings)
 	if err != nil {
 		return nil, err
@@ -47,7 +68,16 @@ func buildRules(settings map[interface{}]interface{}) (map[string]string, error)
 	}
 
 	rules := extend(defaultRules, osRules)
-	return rules, err
+
+	result := Rules{}
+	for source, target := range rules {
+		rule := Rule{source, target}
+		result = append(result, rule)
+	}
+
+	sort.Sort(result)
+
+	return result, err
 }
 
 func buildSpecificOsRules(os string, settings map[interface{}]interface{}) (map[string]string, error) {
@@ -88,7 +118,7 @@ func extend(m1, m2 map[string]string) map[string]string {
 	return (result)
 }
 
-func createSymbolicLinks(rules map[string]string, sourceDirectoryPath string) error {
+func createSymbolicLinks(rules Rules, sourceDirectoryPath string) error {
 	targetDirectoryAbsolutePath, err := jwfp.GetHomeDirectory()
 	if err != nil {
 		return err
@@ -100,9 +130,9 @@ func createSymbolicLinks(rules map[string]string, sourceDirectoryPath string) er
 
 	fmt.Printf("%s => %s\n", sourceDirectoryAbsolutePath, targetDirectoryAbsolutePath)
 
-	for source, target := range rules {
-		sourceAbsolutePath := gofp.Join(sourceDirectoryAbsolutePath, source)
-		targetAbsolutePath := gofp.Join(targetDirectoryAbsolutePath, target)
+	for _, rule := range rules {
+		sourceAbsolutePath := gofp.Join(sourceDirectoryAbsolutePath, rule.source)
+		targetAbsolutePath := gofp.Join(targetDirectoryAbsolutePath, rule.target)
 		if !jwfp.ExistsPath(sourceAbsolutePath) {
 			fmt.Printf("[skipped] \"%s\" source file is not exists.\n", sourceAbsolutePath)
 			continue
