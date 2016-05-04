@@ -2,3 +2,4 @@
 version: 0.1.5
 files:
   README.md: v%.%.%
+  release_tag: v%.%.%
