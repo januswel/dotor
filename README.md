@@ -10,7 +10,7 @@ dotfile setuper
 
 ## install
 
-Just get a newest binary for your os and arch and "dotor.yml" from [release page](./releases).
+Just get a newest binary for your os and arch and "dotor.yml" from [release page](https://github.com/januswel/dotor/releases).
 
 ## usage
 
