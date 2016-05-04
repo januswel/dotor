@@ -3,7 +3,7 @@ machine:
   timezone: 'Asia/Tokyo'
 deployment:
   release:
-    tag: '/v[1-9][0-9]*(\.[1-9][0-9]*){2}/'
+    tag: '/v[1-9][0-9]*\.[1-9][0-9]*\.[1-9][0-9]*/'
     owner: 'circleci'
     commands:
       - 'go get github.com/mitchellh/gox'
