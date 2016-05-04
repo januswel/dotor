@@ -1,4 +1,4 @@
-# dotor v0.1.1
+# dotor v0.1.2
 
 [![Circle CI](https://circleci.com/gh/januswel/dotor/tree/master.svg?style=shield)](https://circleci.com/gh/:user/:repo/tree/master)
 
