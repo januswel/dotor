@@ -1,6 +1,6 @@
 ---
 machine:
-	timezone: 'Asia/Tokyo'
+	timezone: 'Asia\/Tokyo'
 deployment:
 	release:
 		branch: 'master'
