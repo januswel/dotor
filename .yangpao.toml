@@ -1,0 +1,13 @@
+Current = "0.1.9"
+
+[[Files]]
+  Path = "README.md"
+  Prefix = "v"
+  Postfix = ""
+  IsNumber = false
+
+[[Files]]
+  Path = "release_tag"
+  Prefix = "v"
+  Postfix = ""
+  IsNumber = false
