@@ -31,6 +31,12 @@ default:
     - .vimperator
     - .vimperatorrc
 
+    # npm
+    - .npmrc
+
+    # EditorConfig
+    - .editorconfig
+
 # for windows settings
 windows:
     - source: .vim
