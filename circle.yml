@@ -18,13 +18,13 @@ jobs:
     working_directory: /go/src/github.com/januswel/dotor
     steps:
       - checkout
+      - run: go get github.com/mitchellh/gox
+      - run: go get github.com/tcnksm/ghr
   deploy:
     machine:
       enabled: true
     working_directory: /go/src/github.com/januswel/dotor
     steps:
-      - run: go get github.com/mitchellh/gox
-      - run: go get github.com/tcnksm/ghr
       - run: gox -osarch "linux/amd64 linux/arm darwin/amd64 windows/amd64" -output "dist/{{.Dir}}_{{.OS}}_{{.Arch}}"
       - run: cp dotor.yml dist/dotor.yml
       - run: ghr -t ${GITHUB_TOKEN} -u ${USERNAME} -r ${CIRCLE_PROJECT_REPONAME} --replace $(cat release_tag) dist/
