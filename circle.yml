@@ -19,6 +19,9 @@ jobs:
     steps:
       - checkout
   deploy:
+    machine:
+      enabled: true
+    working_directory: /go/src/github.com/{{ORG_NAME}}/{{REPO_NAME}}
     steps:
       - run: go get github.com/mitchellh/gox
       - run: go get github.com/tcnksm/ghr
