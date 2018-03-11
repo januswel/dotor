@@ -24,11 +24,11 @@ jobs:
       - run: ghr -t ${GITHUB_TOKEN} -u ${USERNAME} -r ${CIRCLE_PROJECT_REPONAME} --replace $(cat release_tag) dist/
 workflows:
   version: 2
-  build_and_test:
+  build_and_deploy:
     jobs:
       - build
       - deploy:
-          required:
+          requires:
             - build
           filters:
             branches:
